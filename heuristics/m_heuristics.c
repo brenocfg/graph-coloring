@@ -18,7 +18,7 @@ uint32_t welsh_powell(int8_t* graph, int16_t numv){
 	uint8_t *c_used = (uint8_t*) malloc(numv*sizeof(uint8_t));
 	vertex_t *vertices = (vertex_t*) malloc(numv*sizeof(vertex_t));
 
-	uint8_t i,j;
+	uint32_t i,j;
 	for (i = 0; i < numv; i++) {
 		vertices[i].index = i;
 		vertices[i].degree = 0;

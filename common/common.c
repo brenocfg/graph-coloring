@@ -31,7 +31,7 @@ int8_t *read_input(char *filename, int16_t *num_ver) {
 
 	int8_t *graph = (int8_t*) malloc(numv*numv*sizeof(int8_t));
 	memset(graph, 0, numv*numv*sizeof(int8_t));
-	uint16_t i;
+	uint32_t i;
 	for (i = 0; i < nume; i++) {
 		int32_t v1, v2;
 		fscanf(input, "%d %d\n", &v1, &v2);
