@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+#include "common.h"
+
+void print_graph (int8_t *graph, int16_t num_ver) {
+	int16_t i, j;
+
+	for (i = 0; i < num_ver; i++) {
+		for (j = 0; j < num_ver; j++) {
+			fprintf(stderr, "%d\t", graph[i * num_ver + j]);
+		}
+		fprintf(stderr, "\n");
+	}
+}
+
+int8_t *read_input(char *filename, int16_t *num_ver) {
+	FILE *input;
+
+	input = fopen(filename, "r");
+	if (input == NULL) {
+		fprintf(stderr, "Error reading input file!\n");
+		return 0;
+	}
+
+	int type, numv, nume;
+	fscanf(input, "%d %d\n", &numv, &nume);
+	*num_ver = numv;
+
+	int8_t *graph = (int8_t*) malloc(numv*nume*sizeof(int8_t));
+	memset(graph, 0, numv*nume*sizeof(int8_t));
+	uint16_t i;
+	for (i = 0; i < nume; i++) {
+		int32_t v1, v2;
+		fscanf(input, "%d %d\n", &v1, &v2);
+		graph[(v1-1)*numv + (v2-1)] = 1;
+		graph[(v2-1)*numv + (v1-1)] = 1;
+	}
+
+	fclose(input);
+
+	return graph;
+}
+
+double run(int8_t num_runs, int8_t *graph, int16_t num_cities,
+										uint32_t(*fun) (int8_t*, int16_t)) {
+	clock_t begin, end;
+	double total = 0.0;
+
+	uint8_t i;
+	for (i = 0; i < num_runs; i++) {
+		fprintf(stderr, "----- RUN #%d -----\n", i+1);
+		begin = clock();
+		fprintf(stderr, "Function returned %d\n", fun(graph, num_cities));
+		end = clock();
+		fprintf(stderr, "%.64lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
+		total += ((double) (end - begin)/CLOCKS_PER_SEC);
+	}
+
+	total = total/num_runs;
+
+	return total;
+}
