@@ -47,7 +47,7 @@ uint32_t welsh_powell(int8_t* graph, int16_t numv){
 
 		for (j = 0; j < croma_n; j++) {
 			if(!c_used[j]){
-				colors[index] = j+1;
+				colors[index] = j;
 				break;
 			}
 		}
