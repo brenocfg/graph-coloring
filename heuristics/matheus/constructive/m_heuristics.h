@@ -10,6 +10,6 @@ struct vertex{
 	uint32_t degree;
 };
 
-uint32_t welsh_powell(uint8_t* graph, uint16_t numv, uint32_t **colors);
+uint32_t welsh_powell(uint8_t* graph, uint16_t numv, uint32_t **answer);
 
 #endif /*M_HEURISTICS_H*/

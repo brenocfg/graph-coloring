@@ -33,7 +33,7 @@ uint8_t *read_input(char *filename, uint16_t *num_ver) {
 	input = fopen(filename, "r");
 	if (input == NULL) {
 		fprintf(stderr, "Error reading input file!\n");
-		return 0;
+		return NULL;
 	}
 
 	int numv, nume;
