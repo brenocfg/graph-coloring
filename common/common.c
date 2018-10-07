@@ -16,6 +16,17 @@ void print_graph (int8_t *graph, int16_t num_ver) {
 	}
 }
 
+
+int check_solution(int8_t* graph, int16_t numv, uint32_t *colors){
+	uint32_t i,j;
+	for (i = 0; i < numv; i++) 
+		for (j = 0; j < numv; j++) 
+			if(graph[i*numv + j] && colors[i]==colors[j])
+				return 1;
+
+	return 0;
+}
+
 int8_t *read_input(char *filename, int16_t *num_ver) {
 	FILE *input;
 
@@ -45,16 +56,21 @@ int8_t *read_input(char *filename, int16_t *num_ver) {
 }
 
 double run(int8_t num_runs, int8_t *graph, int16_t num_cities,
-										uint32_t(*fun) (int8_t*, int16_t)) {
+										uint32_t(*fun) (int8_t*, int16_t, uint32_t**)) {
 	clock_t begin, end;
 	double total = 0.0;
-
+	uint32_t *colors;
 	uint8_t i;
+
 	for (i = 0; i < num_runs; i++) {
 		fprintf(stderr, "----- RUN #%d -----\n", i+1);
 		begin = clock();
-		fprintf(stderr, "Function returned %d\n", fun(graph, num_cities));
+		fprintf(stderr, "Function returned %d\n", fun(graph, num_cities,&colors));
 		end = clock();
+		if(check_solution(graph,num_cities,colors)){
+			fprintf(stderr,"Invalid solution");
+		}
+		free(colors);
 		fprintf(stderr, "%.64lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
 		total += ((double) (end - begin)/CLOCKS_PER_SEC);
 	}

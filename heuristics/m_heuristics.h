@@ -7,4 +7,4 @@ struct vertex{
 	uint32_t degree;
 };
 
-uint32_t welsh_powell(int8_t* graph, int16_t numv);
+uint32_t welsh_powell(int8_t* graph, int16_t numv, uint32_t **colors);
