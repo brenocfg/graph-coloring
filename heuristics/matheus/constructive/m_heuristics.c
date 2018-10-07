@@ -12,7 +12,7 @@ int cmp_degree (const void * a, const void * b) {
 	return bb->degree - aa->degree;
 }
 
-uint32_t welsh_powell(int8_t* graph, int16_t numv, uint32_t **answer){
+uint32_t welsh_powell(uint8_t* graph, uint16_t numv, uint32_t **answer){
 	uint32_t croma_n = 0;
 	uint8_t *c_used = (uint8_t*) malloc(numv*sizeof(uint8_t));
 	vertex_t *vertices = (vertex_t*) malloc(numv*sizeof(vertex_t));
@@ -41,9 +41,9 @@ uint32_t welsh_powell(int8_t* graph, int16_t numv, uint32_t **answer){
 		colors[index] = croma_n;
 
 		memset(c_used,0,numv*sizeof(uint8_t));
-		
+
 		for (j = 0; j < numv; j++) {
-			if(graph[index*numv + j] && colors[j]!=INF){
+			if(graph[index*numv + j] && colors[j] != (uint32_t) INF){
 				c_used[colors[j]] = 1;
 			}
 		}
@@ -54,7 +54,7 @@ uint32_t welsh_powell(int8_t* graph, int16_t numv, uint32_t **answer){
 				break;
 			}
 		}
-		
+
 		if(colors[index] == croma_n){
 			croma_n++;
 		}

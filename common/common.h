@@ -1,15 +1,20 @@
 //----------------------Heuristics and Meta-heuristics-------------------------
 //----------------Student: Breno Campos Ferreira Guimaraes---------------------
 
+#ifndef COMMON_H
+#define COMMON_H
+
 #include <stdint.h> //portable types
 
 /*Dumps graph to stderr, for debugging purposes*/
-void print_graph(int8_t *graph, int16_t num_ver);
+void print_graph(uint8_t *graph, uint16_t num_ver);
 
 /*Reads TSP input instance and returns a complete graph of distances.*/
-int8_t *read_input(char *filename, int16_t *num_ver);
+uint8_t *read_input(char *filename, uint16_t *num_ver);
 
 /*Runs the given function @num_runs times and returns the average runtime
 over all runs.*/
-double run(int8_t num_runs, int8_t *graph, int16_t num_ver,
-										uint32_t(*fun) (int8_t*, int16_t, uint32_t**));
+double run(uint8_t num_runs, uint8_t *graph, uint16_t num_ver,
+							uint32_t(*fun) (uint8_t*, uint16_t, uint32_t**));
+
+#endif /*COMMON_H*/
