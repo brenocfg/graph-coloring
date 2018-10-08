@@ -19,7 +19,10 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
+	/*welsh powell algorithm (greedy largest degree first)*/
 	run(atoi(argv[2]), graph, numv, welsh_powell);
+
+	/*random sequential ordering algorithm (greedy random order)*/
 	run(atoi(argv[2]), graph, numv, rnd);
 
 	return 0;

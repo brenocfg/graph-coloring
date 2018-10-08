@@ -58,14 +58,15 @@ uint32_t rnd(uint8_t* graph, uint16_t num_ver, uint32_t **colors) {
 		uint32_t index = vers[i].id;
 		c_ptr[index] = answer;
 
+		/*compute available colors*/
 		memset(avl_col, 1, num_ver*sizeof(uint8_t));
-
 		for (j = 0; j < num_ver; j++) {
 			if(graph[index*num_ver + j] && c_ptr[j] != (uint32_t) INF) {
 				avl_col[c_ptr[j]] = 0;
 			}
 		}
 
+		/*assign first available color*/
 		for (j = 0; j < answer; j++) {
 			if(avl_col[j]) {
 				c_ptr[index] = j;
@@ -73,6 +74,7 @@ uint32_t rnd(uint8_t* graph, uint16_t num_ver, uint32_t **colors) {
 			}
 		}
 
+		/*if new color increment answer*/
 		if (c_ptr[index] == answer) {
 			answer++;
 		}
