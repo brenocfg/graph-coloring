@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rnd.h"
+#include "con.h"
 
 struct vertex {
 	uint32_t id;

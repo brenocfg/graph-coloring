@@ -3,7 +3,7 @@
 
 #include "common/common.h"
 #include "heuristics/matheus/constructive/m_heuristics.h"
-#include "heuristics/breno/constructive/rnd.h"
+#include "heuristics/breno/constructive/con.h"
 
 int main(int argc, char* argv[]){
 	uint16_t numv;
@@ -18,10 +18,24 @@ int main(int argc, char* argv[]){
 		fprintf(stderr, "Fatal error: no input file.\n");
 		return 1;
 	}
+	uint32_t cost, *ans;
+	double avg;
 
-	run(atoi(argv[2]), graph, numv, welsh_powell);
-	run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
-	run(atoi(argv[2]), graph, numv, rnd);
+	cost = rnd(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, rnd);
+	fprintf(stdout, "%d,", cost);
+
+	cost = welsh_powell(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, welsh_powell);
+	fprintf(stdout, "%d,", cost);
+
+	cost = snt(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, snt);
+	fprintf(stdout, "%d,", cost);
+
+	cost = welsh_powell_brtiebreak(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
+	fprintf(stdout, "%d\n", cost);
 
 	return 0;
 }
