@@ -20,6 +20,7 @@ int main(int argc, char* argv[]){
 	}
 
 	run(atoi(argv[2]), graph, numv, welsh_powell);
+	run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
 	run(atoi(argv[2]), graph, numv, rnd);
 
 	return 0;
