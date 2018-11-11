@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O3 -Wextra -Wall
+CFLAGS=-O3 -Wextra -Wall -lm
 
 main: common.o m_heuristics.o rnd.o m_metaheuristics.o snt.o
 	$(CC) main.c m_heuristics.o common.o rnd.o m_metaheuristics.o snt.o -o tp $(CFLAGS)
