@@ -148,3 +148,107 @@ uint32_t one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **an
 
 	return ++croma_n;
 }
+
+uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **answer, uint32_t c_n){
+	uint32_t croma_n = c_n;
+	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
+	uint32_t actual_penalty = 0;
+
+	uint32_t *colors = *answer;
+
+	memcpy(candidate,colors,numv*sizeof(uint32_t));
+
+	while(!check_solution(graph,numv,candidate)){
+		memcpy(colors,candidate,numv*sizeof(uint32_t));
+
+		reduce_colors(graph,&candidate,numv,croma_n);
+
+		croma_n--;
+		
+		if(check_solution(graph,numv,candidate)){
+			fixed_penalty_local_search(graph,&candidate,numv,croma_n);
+		}
+	}
+
+	free(candidate);
+
+	return ++croma_n;
+}
+
+int cmp_deg(const void * a, const void * b) {
+	vertex_t *aa = (vertex_t*) a;
+	vertex_t *bb = (vertex_t*) b;
+	return bb->degree - aa->degree;
+}
+
+uint32_t rand_welsh_powell(uint8_t* graph, uint16_t numv, uint32_t **answer){
+	uint32_t croma_n = 0;
+	uint8_t *c_used = (uint8_t*) malloc(numv*sizeof(uint8_t));
+	vertex_t *vertices = (vertex_t*) malloc(numv*sizeof(vertex_t));
+
+	*answer = (uint32_t*) malloc(numv*sizeof(uint32_t));
+
+	uint32_t *colors = *answer;
+
+	uint32_t i,j;
+	for (i = 0; i < numv; i++) {
+		vertices[i].index = i;
+		vertices[i].degree = 0;
+		colors[i] = INF;
+		for (j = 0; j < numv; j++) {
+			if(graph[i*numv + j]){
+				vertices[i].degree++;
+			}
+		}
+	}
+
+	int alpha = rand() % (int) ceil(0.5*numv);
+
+	qsort(vertices+alpha, numv-alpha, sizeof(vertex_t), cmp_deg);
+
+	colors[vertices[0].index] = croma_n++;
+	for (i = 1; i < numv; i++) {
+		int index = vertices[i].index;
+		colors[index] = croma_n;
+
+		memset(c_used,0,numv*sizeof(uint8_t));
+
+		for (j = 0; j < numv; j++) {
+			if(graph[index*numv + j] && colors[j] != (uint32_t) INF){
+				c_used[colors[j]] = 1;
+			}
+		}
+
+		for (j = 0; j < croma_n; j++) {
+			if(!c_used[j]){
+				colors[index] = j;
+				break;
+			}
+		}
+
+		if(colors[index] == croma_n){
+			croma_n++;
+		}
+	}
+
+	return croma_n;
+}
+
+uint32_t grasp(uint8_t* graph, uint16_t numv, uint32_t **answer){
+	uint8_t it;
+	uint32_t c_n;
+	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
+
+	uint32_t best = one_exchange_fixed_penalty(graph, numv, answer);
+
+	for(it = 0; it < 20; it++){
+		c_n = rand_welsh_powell(graph,numv,&candidate);
+		c_n = grasp_one_exchange_fixed_penalty(graph,numv,&candidate,c_n);
+		if(c_n<best){
+			best = c_n;
+			memcpy(*answer,candidate,numv*sizeof(uint32_t));
+		}
+	}
+
+	return best;
+}
