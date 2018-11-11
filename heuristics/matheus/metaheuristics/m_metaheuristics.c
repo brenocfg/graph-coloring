@@ -72,7 +72,6 @@ void fixed_penalty_local_search(uint8_t* graph,uint32_t** candidate, uint16_t nu
 	}
 
 	for (i = 0; i < numv; i++){
-		mem[i][0]++;
 		for (j = 0; j < numv; j++){
 			if(graph[i*numv + j]){
 				mem[i][colors[j]]++;
@@ -133,6 +132,7 @@ uint32_t one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **an
 	memcpy(candidate,colors,numv*sizeof(uint32_t));
 
 	while(!check_solution(graph,numv,candidate)){
+			
 		memcpy(colors,candidate,numv*sizeof(uint32_t));
 
 		reduce_colors(graph,&candidate,numv,croma_n);
@@ -160,7 +160,6 @@ uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_
 
 	while(!check_solution(graph,numv,candidate)){
 		memcpy(colors,candidate,numv*sizeof(uint32_t));
-
 		reduce_colors(graph,&candidate,numv,croma_n);
 
 		croma_n--;
@@ -237,17 +236,20 @@ uint32_t rand_welsh_powell(uint8_t* graph, uint16_t numv, uint32_t **answer){
 uint32_t grasp(uint8_t* graph, uint16_t numv, uint32_t **answer){
 	uint8_t it;
 	uint32_t c_n;
-	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
+	uint32_t *candidate;
 
 	uint32_t best = one_exchange_fixed_penalty(graph, numv, answer);
 
 	for(it = 0; it < 20; it++){
 		c_n = rand_welsh_powell(graph,numv,&candidate);
 		c_n = grasp_one_exchange_fixed_penalty(graph,numv,&candidate,c_n);
+		
 		if(c_n<best){
 			best = c_n;
 			memcpy(*answer,candidate,numv*sizeof(uint32_t));
 		}
+
+		free(candidate);
 	}
 
 	return best;
