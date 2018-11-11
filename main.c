@@ -4,6 +4,8 @@
 #include "common/common.h"
 #include "heuristics/matheus/constructive/m_heuristics.h"
 #include "heuristics/breno/constructive/rnd.h"
+#include "heuristics/matheus/metaheuristics/m_metaheuristics.h"
+
 
 int main(int argc, char* argv[]){
 	uint16_t numv;
@@ -19,9 +21,14 @@ int main(int argc, char* argv[]){
 		return 1;
 	}
 
-	run(atoi(argv[2]), graph, numv, welsh_powell);
+	srand(32);
+
+	//run(atoi(argv[2]), graph, numv, welsh_powell);
 	run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
-	run(atoi(argv[2]), graph, numv, rnd);
+	//run(atoi(argv[2]), graph, numv, rnd);
+	run(atoi(argv[2]), graph, numv, one_exchange_fixed_penalty);
+
+
 
 	return 0;
 }

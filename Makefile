@@ -1,8 +1,11 @@
 CC=gcc
 CFLAGS=-O3 -Wextra -Wall
 
-main: common.o m_heuristics.o rnd.o
-	$(CC) main.c m_heuristics.o common.o rnd.o -o tp $(CFLAGS)
+main: common.o m_heuristics.o rnd.o m_metaheuristics.o
+	$(CC) main.c m_heuristics.o common.o rnd.o m_metaheuristics.o -o tp $(CFLAGS)
+
+m_metaheuristics.o: m_heuristics.o common.o heuristics/matheus/metaheuristics/m_metaheuristics.c heuristics/matheus/metaheuristics/m_metaheuristics.h
+	$(CC) -c heuristics/matheus/metaheuristics/m_metaheuristics.c common.o m_heuristics.o -o m_metaheuristics.o $(CFLAGS)
 
 m_heuristics.o: heuristics/matheus/constructive/m_heuristics.c heuristics/matheus/constructive/m_heuristics.h
 	$(CC) -c heuristics/matheus/constructive/m_heuristics.c -o m_heuristics.o $(CFLAGS)
