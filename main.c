@@ -43,7 +43,11 @@ int main(int argc, char* argv[]){
 	cost = one_exchange_fixed_penalty(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, one_exchange_fixed_penalty);
 	fprintf(stdout, "%d\n", cost);
-
+/*
+	cost = one_exchange_penalty(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, one_exchange_penalty);
+	fprintf(stdout, "%d\n", cost);
+*/
 	cost = grasp(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, grasp);
 	fprintf(stdout, "%d\n", cost);

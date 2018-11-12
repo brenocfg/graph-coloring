@@ -79,7 +79,6 @@ void fixed_penalty_local_search(uint8_t* graph,uint32_t** candidate, uint16_t nu
 		}
 	}
 
-
 	while(improve){
 		improve = 0;
 		uint32_t best_v;
@@ -107,7 +106,7 @@ void fixed_penalty_local_search(uint8_t* graph,uint32_t** candidate, uint16_t nu
 		for (i = 0; i < numv; i++) {
 			if(graph[i*numv + best_v]){
 				mem[i][colors[best_v]]--;				
-				mem[i][colors[best_c]]++;
+				mem[i][best_c]++;
 			}
 		}
 		colors[best_v] = best_c;
@@ -123,7 +122,6 @@ void fixed_penalty_local_search(uint8_t* graph,uint32_t** candidate, uint16_t nu
 uint32_t one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **answer){
 	uint32_t croma_n = 0;
 	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
-	uint32_t actual_penalty = 0;
 
 	croma_n = welsh_powell_brtiebreak(graph,numv,answer);
 
@@ -152,7 +150,6 @@ uint32_t one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **an
 uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_t **answer, uint32_t c_n){
 	uint32_t croma_n = c_n;
 	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
-	uint32_t actual_penalty = 0;
 
 	uint32_t *colors = *answer;
 
@@ -240,10 +237,10 @@ uint32_t grasp(uint8_t* graph, uint16_t numv, uint32_t **answer){
 
 	uint32_t best = one_exchange_fixed_penalty(graph, numv, answer);
 
-	for(it = 0; it < 20; it++){
+	for(it = 0; it < 100; it++){
 		c_n = rand_welsh_powell(graph,numv,&candidate);
 		c_n = grasp_one_exchange_fixed_penalty(graph,numv,&candidate,c_n);
-		
+
 		if(c_n<best){
 			best = c_n;
 			memcpy(*answer,candidate,numv*sizeof(uint32_t));
@@ -254,3 +251,156 @@ uint32_t grasp(uint8_t* graph, uint16_t numv, uint32_t **answer){
 
 	return best;
 }
+
+
+/*
+uint32_t penalty_local_search(uint8_t* graph, uint32_t** candidate, uint16_t numv, uint32_t croma_n){
+	//uint32_t n_conflicts = 0;
+	uint32_t i,j,k;
+	uint8_t improve = 1;
+	uint32_t *colors = *candidate;
+	uint32_t **mem = (uint32_t**) malloc(numv*sizeof(uint32_t*));
+	uint32_t *c_used = (uint32_t*) malloc((numv+1)*sizeof(uint32_t));
+
+	for (i = 0; i < numv; i++) {
+		c_used[i] = 0;
+		mem[i] = (uint32_t*) malloc((numv+1)*sizeof(uint32_t));
+		for(j=0; j < numv; j++){
+			mem[i][j] = 0;
+		}
+	}
+
+	for (i = 0; i < numv; i++){
+		c_used[colors[i]]++;
+		for (j = 0; j < numv; j++){
+			if(graph[i*numv + j]){
+				mem[i][colors[j]]++;
+			}
+		}
+	}
+
+	//printf("show\n");
+
+	while(improve){
+		improve = 0;
+		uint32_t best_v;
+		uint32_t best_c;
+		int32_t best_r = -99999999;
+
+		for(i = 0; i < numv; i++){
+			for(j = 0; j < croma_n+1; j++){
+				if(colors[i]==j)
+					continue;
+
+				int32_t ci_a_old = c_used[colors[i]];
+				int32_t ci_b_old = c_used[j];
+				int32_t ci_a = c_used[colors[i]]-1;
+				int32_t ci_b = c_used[j]+1;
+
+				int32_t ei_a_old = 0;
+				for(k=0;k<numv;k++){
+					ei_a_old += mem[k][colors[i]];
+				}
+
+				int32_t ei_b_old = 0;
+				for(k=0;k<numv;k++){
+					ei_b_old += mem[k][j];
+				}
+
+				int32_t ei_a = 0;
+				for(k=0;k<numv;k++){
+					if(!graph[i*numv+k]){
+						ei_a += mem[k][colors[i]];
+					}else{
+						ei_a += mem[k][colors[i]]-1;
+					}
+				}
+				
+				int32_t ei_b = 0;
+				for(k=0;k<numv;k++){
+					if(!graph[i*numv+k]){
+						ei_b += mem[k][j];
+					}else{
+						ei_b += mem[k][j]+1;
+					}
+				}
+
+				int32_t res = (2*(ci_a_old*ei_a_old) - (ci_a_old*ci_a_old)
+					+ (2*(ci_b_old*ei_b_old) - (ci_b_old*ci_b_old)) ) -
+					(2*(ci_a*ei_a) - (ci_a*ci_a)
+					+ (2*(ci_b*ei_b) - (ci_b*ci_b)));
+
+				if(res>best_r){
+					best_r = res;
+					best_v = i;
+					best_c = j;
+				}
+
+				if(res>0){
+					improve = 1;
+				}
+			}
+		}
+
+		//fprintf(stderr,"%d\n", best_r);
+
+		if(!improve)
+			break;
+
+		c_used[colors[best_v]]--;
+		c_used[best_c]++;
+
+		for (i = 0; i < numv; i++) {
+			if(graph[i*numv + best_v]){
+				mem[i][colors[best_v]]--;
+				mem[i][best_c]++;
+			}
+		}
+
+		if(!c_used[colors[best_v]]){
+			if(best_c > colors[best_v])
+				best_c--;
+
+			for(i=colors[best_v]+1;i<numv;i++){
+				c_used[i-1] = c_used[i];
+			}
+
+			for(i = 0; i < numv; i++){
+				if(colors[i]>colors[best_v]){
+					colors[i]--;
+				}
+			}
+		}else if(best_c == croma_n){
+			croma_n++;
+		}
+
+		colors[best_v] = best_c;
+	}
+
+	for (i = 0; i < numv; i++) {
+		free(mem[i]);
+	}
+
+	free(mem);
+
+	return croma_n;
+}
+
+uint32_t one_exchange_penalty(uint8_t* graph, uint16_t numv, uint32_t **answer){
+	uint32_t croma_n = 0;
+	uint32_t *candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
+
+	croma_n = welsh_powell_brtiebreak(graph,numv,answer);
+
+	uint32_t *colors = *answer;
+
+	memcpy(candidate,colors,numv*sizeof(uint32_t));
+
+	//fprintf(stderr,"show\n");
+
+	croma_n = penalty_local_search(graph,answer,numv,croma_n);
+
+	free(candidate);
+
+	return croma_n;
+}*/
