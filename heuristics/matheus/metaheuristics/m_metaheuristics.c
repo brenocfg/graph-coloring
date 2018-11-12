@@ -1,4 +1,5 @@
 #include "m_metaheuristics.h"
+#include "../constructive/m_heuristics.h"
 
 #define INF (numv+1)
 
@@ -155,7 +156,7 @@ uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_
 
 	memcpy(candidate,colors,numv*sizeof(uint32_t));
 
-	while(!check_solution(graph,numv,candidate)){
+	do {
 		memcpy(colors,candidate,numv*sizeof(uint32_t));
 		reduce_colors(graph,&candidate,numv,croma_n);
 
@@ -164,7 +165,7 @@ uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_
 		if(check_solution(graph,numv,candidate)){
 			fixed_penalty_local_search(graph,&candidate,numv,croma_n);
 		}
-	}
+	}while(!check_solution(graph,numv,candidate));
 
 	free(candidate);
 
@@ -248,6 +249,122 @@ uint32_t grasp(uint8_t* graph, uint16_t numv, uint32_t **answer){
 
 		free(candidate);
 	}
+
+	return best;
+}
+
+
+void generate_random(uint16_t numv, uint32_t **answer, uint32_t k){
+	int i;
+
+	for(i=0; i<numv; i++){
+		(*answer)[i] = rand() % k;
+	}
+}
+
+void tabucol(uint8_t* graph, uint16_t numv, uint32_t **answer, uint32_t k){
+
+	generate_random(numv,answer,k);
+
+	uint32_t **mem ;//= (uint32_t**) malloc(numv*sizeof(uint32_t*));
+
+	uint32_t *colors = *answer;
+	uint32_t it,best_c,best_v,i,j;
+	int32_t best_r;
+	int32_t n_conflicts = 0;
+
+	
+	uint16_t **tabu_list;
+
+	mem = (uint32_t**) malloc(numv*sizeof(uint32_t*));
+	tabu_list = (uint16_t**) malloc(numv*sizeof(uint16_t*));
+
+
+	for (i = 0; i < numv; i++) {
+		mem[i] = (uint32_t*) malloc(k*sizeof(uint32_t));
+		tabu_list[i] = (uint16_t*) malloc(k*sizeof(uint16_t));
+		for(j=0; j < k; j++){
+			tabu_list[i][j] = 0;
+			mem[i][j] = 0;
+		}
+	}
+
+	for (i = 0; i < numv; i++){
+		for (j = 0; j < numv; j++){
+			if(graph[i*numv + j]){
+				mem[i][colors[j]]++;
+			}
+		}
+	}
+
+	for (i = 0; i < numv; i++){
+		for (j = i+1; j < numv; j++){
+			if(graph[i*numv + j] && colors[i] == colors[j])
+				n_conflicts++;
+		}
+	}
+
+	for(it = 0; it < 1000; it++){
+		best_r = -9999;
+
+		for(i = 0; i < k; i++){
+			for(j = 0; j < numv; j++){
+				int32_t res = mem[j][colors[j]]-mem[j][i];
+				if((res>best_r && tabu_list[j][i] <= it) || res == n_conflicts){
+					best_r = res;
+					best_v = j;
+					best_c = i;
+				}
+			}
+		}
+
+		for (i = 0; i < numv; i++) {
+			if(graph[i*numv + best_v]){
+				mem[i][colors[best_v]]--;				
+				mem[i][best_c]++;
+			}
+		}
+
+
+		int32_t ternure = (rand() % 9) + (int)(0.6 * n_conflicts);
+		tabu_list[best_v][best_c] = it+ternure;
+
+		n_conflicts -= best_r;
+		colors[best_v] = best_c;
+
+		if(!n_conflicts)
+			break;		
+	}
+
+	for (i = 0; i < numv; i++) {
+		free(mem[i]);
+		free(tabu_list[i]);
+	}
+	free(tabu_list);
+	free(mem);		
+}
+
+uint32_t tabucol_search(uint8_t* graph, uint16_t numv, uint32_t **answer){
+	uint32_t *candidate;
+
+	uint32_t best = one_exchange_fixed_penalty(graph, numv, answer);
+
+	while(1){
+		candidate = (uint32_t*) malloc(numv*sizeof(uint32_t));
+
+		tabucol(graph,numv,&candidate,best-1);
+
+		if(!check_solution(graph,numv,candidate)){
+			memcpy(*answer,candidate,numv*sizeof(uint32_t));
+			best -= 1;
+		}else{
+			break;
+		}
+
+		free(candidate);
+	}
+
+	free(candidate);
 
 	return best;
 }
