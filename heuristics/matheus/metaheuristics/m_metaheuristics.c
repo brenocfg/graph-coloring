@@ -1,4 +1,5 @@
 #include "m_metaheuristics.h"
+#include "../constructive/m_heuristics.h"
 
 #define INF (numv+1)
 
@@ -108,7 +109,7 @@ void fixed_penalty_local_search(uint8_t* graph,uint32_t** candidate, uint16_t nu
 		for (i = 0; i < numv; i++) {
 			if(graph[i*numv + best_v]){
 				mem[i][colors[best_v]]--;				
-				mem[i][colors[best_c]]++;
+				mem[i][best_c]++;
 			}
 		}
 		colors[best_v] = best_c;
@@ -158,7 +159,7 @@ uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_
 
 	memcpy(candidate,colors,numv*sizeof(uint32_t));
 
-	while(!check_solution(graph,numv,candidate)){
+	do {
 		memcpy(colors,candidate,numv*sizeof(uint32_t));
 
 		reduce_colors(graph,&candidate,numv,croma_n);
@@ -168,7 +169,7 @@ uint32_t grasp_one_exchange_fixed_penalty(uint8_t* graph, uint16_t numv, uint32_
 		if(check_solution(graph,numv,candidate)){
 			fixed_penalty_local_search(graph,&candidate,numv,croma_n);
 		}
-	}
+	}while(!check_solution(graph,numv,candidate));
 
 	free(candidate);
 

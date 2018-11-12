@@ -16,6 +16,7 @@ uint8_t *read_input(char *filename, uint16_t *num_ver);
 over all runs.*/
 double run(uint8_t num_runs, uint8_t *graph, uint16_t num_ver,
 							uint32_t(*fun) (uint8_t*, uint16_t, uint32_t**));
+
 /*Check if its a feasible solution*/
 int check_solution(uint8_t* graph, uint16_t numv, uint32_t *colors);
 

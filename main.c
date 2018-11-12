@@ -5,6 +5,7 @@
 #include "heuristics/matheus/constructive/m_heuristics.h"
 #include "heuristics/matheus/metaheuristics/m_metaheuristics.h"
 #include "heuristics/breno/constructive/con.h"
+#include "heuristics/breno/metaheuristics/meta.h"
 
 int main(int argc, char* argv[]){
 	uint16_t numv;
@@ -38,14 +39,18 @@ int main(int argc, char* argv[]){
 
 	cost = welsh_powell_brtiebreak(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
-	fprintf(stdout, "%d\n", cost);
+	fprintf(stdout, "%d,", cost);
 
 	cost = one_exchange_fixed_penalty(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, one_exchange_fixed_penalty);
-	fprintf(stdout, "%d\n", cost);
+	fprintf(stdout, "%d,", cost);
 
 	cost = grasp(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, grasp);
+	fprintf(stdout, "%d,", cost);
+
+	cost = ils(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, ils);
 	fprintf(stdout, "%d\n", cost);
 
 	return 0;
