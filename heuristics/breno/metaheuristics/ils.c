@@ -124,5 +124,7 @@ uint32_t ils(uint8_t *graph, uint16_t numv, uint32_t **answer) {
 		}
 	}
 
+	free(cand);
+
 	return best;
 }

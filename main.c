@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
 
 	srand(32);
 
-	cost = rnd(graph, numv, &ans);
+	/*cost = rnd(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, rnd);
 	fprintf(stdout, "%d,", cost);
 
@@ -39,13 +39,13 @@ int main(int argc, char* argv[]){
 
 	cost = welsh_powell_brtiebreak(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, welsh_powell_brtiebreak);
-	fprintf(stdout, "%d,", cost);
+	fprintf(stdout, "%d,", cost);*/
 
-	cost = one_exchange_fixed_penalty(graph, numv, &ans);
-	avg = run(atoi(argv[2]), graph, numv, one_exchange_fixed_penalty);
+	cost = sa(graph, numv, &ans);
+	avg = run(atoi(argv[2]), graph, numv, sa);
 	fprintf(stdout, "%d\n", cost);
 
-	cost = grasp(graph, numv, &ans);
+	/*cost = grasp(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, grasp);
 	fprintf(stdout, "%d,", cost);
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
 	
 	cost = tabucol_search(graph, numv, &ans);
 	avg = run(atoi(argv[2]), graph, numv, tabucol_search);
-	fprintf(stdout, "%d\n", cost);
+	fprintf(stdout, "%d\n", cost);*/
 
 	return 0;
 }
